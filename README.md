@@ -1,10 +1,11 @@
 # setup-roc
 
 A GitHub Action to install Roc.
+Currently, only installs the latest nightly version.
 
 ## Usage
 
-Add the following step to a GitHub actions workflow file to install Roc.
+Add a step that uses `hasnep/setup-roc` to a GitHub actions workflow file to install Roc and add the binary to the `PATH`.
 
 ```yaml
 steps:
@@ -12,7 +13,19 @@ steps:
     uses: hasnep/setup-roc@main
     with:
       roc-version: nightly
+  - name: Check the Roc version
+    run: roc --version
 ```
+
+The action is designed to work on
+
+- Linux
+  - x86-64
+- MacOS
+  - Apple Silicon (ARM64)
+  - x86-64
+
+Other combinations of platform and processor are not currently supported.
 
 ### Inputs
 
