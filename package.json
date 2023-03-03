@@ -1,0 +1,33 @@
+{
+  "name": "setup-roc",
+  "version": "0.0.0",
+  "private": true,
+  "description": "A GitHub Action to install Roc.",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "ncc build --license licenses.txt --out dist/ src/index.ts",
+    "fix": "eslint --fix src/",
+    "lint": "eslint src/",
+    "format": "prettier --write src/"
+  },
+  "author": "Hannes",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hasnep/setup-roc.git"
+  },
+  "dependencies": {
+    "@actions/core": "^1.10.0",
+    "@actions/github": "^5.1.1",
+    "@actions/tool-cache": "^2.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^18.14.2",
+    "@typescript-eslint/eslint-plugin": "^5.54.0",
+    "@typescript-eslint/parser": "^5.54.0",
+    "@vercel/ncc": "^0.36.1",
+    "eslint": "^8.35.0",
+    "prettier": "^2.8.4",
+    "typescript": "^4.9.5"
+  }
+}
