@@ -33,7 +33,8 @@ Other combinations of platform and processor are not currently supported.
   Mutually exclusive with the `roc-version-file` input.
 - `roc-version-file` - Path to the file containing the Roc version to use.
   Mutually exclusive with the `roc-version` input.
-- `token` - The token used to authenticate when fetching from GitHub.
+- `token` - GitHub token to use when accessing the GitHub API.
+  Defaults to the automatically generated GitHub token.
 
 ### Outputs
 
