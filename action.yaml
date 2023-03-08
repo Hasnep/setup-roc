@@ -6,7 +6,7 @@ inputs:
     description: The version of Roc to use, defaults to `nightly`. Mutually exclusive with the `roc-version-file` input.
     default: nightly
   roc-version-file:
-    description: Path to the file containing the Roc version to use. Mutually exclusive with the `roc-version` input.
+    description: Path to a file containing the Roc version to use. Mutually exclusive with the `roc-version` input.
   token:
     description: GitHub token to use when accessing the GitHub API. Defaults to the automatically generated GitHub token.
     default: ${{ github.server_url == 'https://github.com' && github.token || '' }}

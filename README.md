@@ -31,7 +31,7 @@ Other combinations of platform and processor are not currently supported.
 
 - `roc-version` - The version of Roc to use, defaults to `nightly`.
   Mutually exclusive with the `roc-version-file` input.
-- `roc-version-file` - Path to the file containing the Roc version to use.
+- `roc-version-file` - Path to a file containing the Roc version to use.
   Mutually exclusive with the `roc-version` input.
 - `token` - GitHub token to use when accessing the GitHub API.
   Defaults to the automatically generated GitHub token.
