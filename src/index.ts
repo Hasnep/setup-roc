@@ -17,6 +17,7 @@ interface Release {
 }
 
 const TOKEN = core.getInput("token");
+const AUTH = TOKEN ? `token ${TOKEN}` : undefined;
 const VERSION = core.getInput("roc-version");
 const VERSION_FILE = core.getInput("roc-version-file");
 const ROC_REPO_OWNER = "roc-lang";
@@ -122,7 +123,7 @@ const getAsset = (
 const downloadRocBinary = async (asset: Asset) => {
   const assetUrl = asset.browser_download_url;
   core.info(`Downloading asset from '${assetUrl}'.`);
-  const downloadPath = await tc.downloadTool(assetUrl);
+  const downloadPath = await tc.downloadTool(assetUrl, undefined, AUTH);
   core.info(`Extracting archive at '${downloadPath}'.`);
   const extractedPath = await tc.extractTar(downloadPath);
   // Get the first folder in the extracted archive
