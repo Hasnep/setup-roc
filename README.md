@@ -20,12 +20,13 @@ steps:
 The action is designed to work on
 
 - Linux
+  - ARM64
   - x86-64
 - MacOS
-  - Apple Silicon (ARM64)
+  - ARM64 (Apple Silicon)
   - x86-64
 
-Other combinations of platform and processor are not currently supported.
+Other combinations of OS and architecture are not currently supported.
 
 ### Inputs
 
