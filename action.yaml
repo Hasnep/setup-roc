@@ -18,5 +18,5 @@ outputs:
     description: The absolute path to the Roc executable.
 
 runs:
-  using: node16
+  using: node20
   main: dist/index.js
