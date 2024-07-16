@@ -58,15 +58,15 @@ const getPlatformAndArchitecture = () => {
       ? architecture === "x64"
         ? "linux_x86_64"
         : architecture === "arm64"
-        ? "linux_arm64"
-        : null
+          ? "linux_arm64"
+          : null
       : platform === "darwin"
-      ? architecture === "arm64"
-        ? "macos_apple_silicon"
-        : architecture === "x64"
-        ? "macos_x86_64"
-        : null
-      : null;
+        ? architecture === "arm64"
+          ? "macos_apple_silicon"
+          : architecture === "x64"
+            ? "macos_x86_64"
+            : null
+        : null;
   if (platformAndArchitecture === null) {
     throw new Error(
       `Unsupported combination of platform '${platform}' and architecture '${architecture}'.`,
