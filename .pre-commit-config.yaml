@@ -1,7 +1,7 @@
 repos:
   # General checks
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+    rev: v4.6.0
     hooks:
       - name: Prevent committing to main
         id: no-commit-to-branch
@@ -43,7 +43,7 @@ repos:
 
   # YAML
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+    rev: v4.6.0
     hooks:
       - name: Validate YAML
         id: check-yaml
@@ -57,7 +57,7 @@ repos:
 
   # JSON
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+    rev: v4.6.0
     hooks:
       - name: Validate JSON
         id: check-json
@@ -80,7 +80,7 @@ repos:
 
   # GitHub Actions
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.21.0
+    rev: 0.29.0
     hooks:
       - name: Validate GitHub Actions workflow files
         id: check-github-workflows
@@ -89,7 +89,7 @@ repos:
 
   # Pre-commit
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.21.0
+    rev: 0.29.0
     hooks:
       - name: Validate Pre-commit config
         id: check-jsonschema
