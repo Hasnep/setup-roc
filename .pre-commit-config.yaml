@@ -22,24 +22,18 @@ repos:
         id: check-shebang-scripts-are-executable
 
   # TypeScript
-  - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v3.0.0
+  - repo: local
     hooks:
       - name: Format TypeScript files
         id: prettier
+        language: system
+        entry: npx prettier --write
         types: [ts]
-  - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v8.44.0
-    hooks:
       - name: Lint TypeScript files
         id: eslint
+        language: system
+        entry: npx eslint --fix
         types: [ts]
-        additional_dependencies:
-          - "@typescript-eslint/eslint-plugin@6.0.0"
-          - "@typescript-eslint/parser@6.0.0"
-          - eslint@8.44.0
-  - repo: local
-    hooks:
       - name: Make sure Typescript code has been transpiled
         id: check-built
         language: system
@@ -53,11 +47,12 @@ repos:
     hooks:
       - name: Validate YAML
         id: check-yaml
-  - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v3.0.0
+  - repo: local
     hooks:
       - name: Format YAML files
         id: prettier
+        language: system
+        entry: npx prettier --write
         types: [yaml]
 
   # JSON
@@ -66,19 +61,21 @@ repos:
     hooks:
       - name: Validate JSON
         id: check-json
-  - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v3.0.0
+  - repo: local
     hooks:
       - name: Format JSON files
         id: prettier
+        language: system
+        entry: npx prettier --write
         types: [json]
 
   # Markdown
-  - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v3.0.0
+  - repo: local
     hooks:
       - name: Format markdown files
         id: prettier
+        language: system
+        entry: npx prettier --write
         types: [markdown]
 
   # GitHub Actions
