@@ -57,6 +57,8 @@ const getPlatformAndArchitecture = () => {
     platform === "linux"
       ? architecture === "x64"
         ? "linux_x86_64"
+        : architecture === "arm64"
+        ? "linux_arm64"
         : null
       : platform === "darwin"
       ? architecture === "arm64"
