@@ -105,8 +105,10 @@ const getAsset = (
   if (release.assets.length == 0) {
     throw new Error(`Release ${release.tag_name} has no assets.`);
   }
-  const assetsForPlatformAndArchitecture = release.assets.filter((asset) =>
-    asset.name.includes(platformAndArchitecture),
+  const assetsForPlatformAndArchitecture = release.assets.filter(
+    (asset) =>
+      asset.name.includes(platformAndArchitecture) &&
+      !asset.name.includes("TESTING"),
   );
   if (assetsForPlatformAndArchitecture.length === 0) {
     throw new Error(
