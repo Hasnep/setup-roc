@@ -20,11 +20,16 @@ jobs:
         operating-systems:
           - ubuntu-latest
           # - macos-latest # TODO: Re-enable one day
+        testing:
+          - "true"
+          - "false"
     runs-on: ${{ matrix.operating-systems }}
     steps:
       - name: Checkout the repo
         uses: actions/checkout@v3
       - name: Run the action
         uses: ./
+        with:
+          testing: ${{ matrix.testing }}
       - name: Make sure Roc is installed
         run: roc --version

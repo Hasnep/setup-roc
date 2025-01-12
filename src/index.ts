@@ -20,6 +20,7 @@ const TOKEN = core.getInput("token");
 const AUTH = TOKEN ? `token ${TOKEN}` : undefined;
 const VERSION = core.getInput("roc-version");
 const VERSION_FILE = core.getInput("roc-version-file");
+const TESTING = core.getInput("testing") === "true";
 const ROC_REPO_OWNER = "roc-lang";
 const ROC_REPO_NAME = "roc";
 const OCTOKIT_CLIENT = gh.getOctokit(TOKEN);
@@ -101,23 +102,26 @@ const getAsset = (
   }
   core.info(`Found a release with the tag '${release.tag_name}'.`);
 
-  // Get the releases matching the specified platform and architecture
   if (release.assets.length == 0) {
     throw new Error(`Release ${release.tag_name} has no assets.`);
   }
-  const assetsForPlatformAndArchitecture = release.assets.filter(
+  // Get the releases matching the specified filters
+  core.info(
+    `Finding assets matching the platform, architecture and ${TESTING ? "marked as testing" : "not marked as testing"}.`,
+  );
+  const assetsMatchingFilters = release.assets.filter(
     (asset) =>
       asset.name.includes(platformAndArchitecture) &&
-      !asset.name.includes("TESTING"),
+      asset.name.includes("TESTING") == TESTING,
   );
-  if (assetsForPlatformAndArchitecture.length === 0) {
+  if (assetsMatchingFilters.length === 0) {
     throw new Error(
-      `Release '${release.tag_name}' has no assets matching the platform and architecture '${platformAndArchitecture}'.`,
+      `Release '${release.tag_name}' has no assets matching the platform and architecture '${platformAndArchitecture}' and ${TESTING ? "marked as testing" : "not marked as testing"}.`,
     );
   }
 
   // Find the most recently released asset for the selected platform and architecture
-  const asset = assetsForPlatformAndArchitecture.sort((a, b) =>
+  const asset = assetsMatchingFilters.sort((a, b) =>
     b.updated_at.localeCompare(a.updated_at),
   )[0];
   core.info(`Found the asset '${asset.name}'.`);
