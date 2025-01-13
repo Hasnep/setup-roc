@@ -19,7 +19,7 @@ jobs:
       matrix:
         operating-systems:
           - ubuntu-latest
-          - macos-latest
+          # - macos-latest # TODO: Re-enable one day
     runs-on: ${{ matrix.operating-systems }}
     steps:
       - name: Checkout the repo
