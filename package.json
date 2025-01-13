@@ -1,6 +1,6 @@
 {
   "name": "setup-roc",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
   "description": "A GitHub Action to install Roc.",
   "main": "dist/index.js",
