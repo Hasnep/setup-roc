@@ -39,6 +39,7 @@ repos:
         language: system
         entry: npm ci && npm run build
         types: [ts, javascript]
+        always_run: true
         pass_filenames: false
 
   # YAML
