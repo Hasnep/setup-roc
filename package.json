@@ -6,8 +6,8 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "ncc build --license licenses.txt --out dist/ src/index.ts",
-    "fix": "eslint --fix src/",
-    "lint": "eslint src/",
+    "fix": "eslint --fix .",
+    "lint": "eslint .",
     "format": "prettier --write src/"
   },
   "author": "Hannes",
@@ -23,11 +23,10 @@
   },
   "devDependencies": {
     "@types/node": "^20.14.10",
-    "@typescript-eslint/eslint-plugin": "^7.16.1",
-    "@typescript-eslint/parser": "^7.16.1",
     "@vercel/ncc": "^0.38.1",
-    "eslint": "^8.56.0",
+    "eslint": "^9.18.0",
     "prettier": "^3.3.3",
-    "typescript": "^5.5.3"
+    "typescript": "^5.5.3",
+    "typescript-eslint": "^8.19.1"
   }
 }

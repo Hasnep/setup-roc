@@ -28,17 +28,17 @@ repos:
         id: prettier
         language: system
         entry: npx prettier --write
-        types: [ts]
+        types: [ts, javascript]
       - name: Lint TypeScript files
         id: eslint
         language: system
         entry: npx eslint --fix
-        types: [ts]
+        types: [ts, javascript]
       - name: Make sure Typescript code has been transpiled
         id: check-built
         language: system
         entry: npm ci && npm run build
-        types: [ts]
+        types: [ts, javascript]
         pass_filenames: false
 
   # YAML
