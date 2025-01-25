@@ -17,17 +17,20 @@ jobs:
     name: Run self
     strategy:
       matrix:
-        operating-systems:
+        operating-system:
           - ubuntu-latest
-          # - macos-latest # TODO: Re-enable one day
+          - macos-latest
         testing:
           - always
           - never
           - auto
-    runs-on: ${{ matrix.operating-systems }}
+    runs-on: ${{ matrix.operating-system }}
     steps:
       - name: Checkout the repo
         uses: actions/checkout@v3
+      - name: install z3 on MacOS
+        if: runner.os == 'macOS'
+        run: brew install z3
       - name: Run the action
         uses: ./
         with:
