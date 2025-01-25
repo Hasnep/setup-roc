@@ -34398,10 +34398,27 @@ const TOKEN = core.getInput("token");
 const AUTH = TOKEN ? `token ${TOKEN}` : undefined;
 const VERSION = core.getInput("roc-version");
 const VERSION_FILE = core.getInput("roc-version-file");
-const TESTING = core.getInput("testing") === "true";
+const TESTING = core.getInput("testing");
 const ROC_REPO_OWNER = "roc-lang";
 const ROC_REPO_NAME = "roc";
 const OCTOKIT_CLIENT = gh.getOctokit(TOKEN);
+const parseTestingInput = (testing) => {
+    const testingLower = testing.toLowerCase();
+    switch (testingLower) {
+        case "auto":
+            return "auto";
+        case "never":
+            return "never";
+        case "always":
+            return "always";
+        case "true":
+            throw new Error("Setting 'TESTING' to 'true' or 'false' is deprecated, use 'auto', 'never' or 'always'.");
+        case "false":
+            throw new Error("Setting 'TESTING' to 'true' or 'false' is deprecated, use 'auto', 'never' or 'always'.");
+        default:
+            throw new Error(`Unexpected value for input 'TESTING': '${TESTING}', needs to be one of 'auto', 'never' or 'always'.`);
+    }
+};
 const getVersion = () => {
     if (VERSION && VERSION_FILE) {
         core.warning("Both 'roc-version' and 'roc-version-file' inputs were specified, only 'roc-version' will be used.");
@@ -34458,27 +34475,43 @@ const getRocReleases = async () => {
     core.info(`Found ${releases.length} releases.`);
     return releases;
 };
-const getAsset = (releases, version, platformAndArchitecture) => {
-    // Get the release matching the version specifier
-    const release = releases.find((release) => release.tag_name === version);
-    if (release === undefined) {
-        throw new Error(`A release with the tag '${version}' could not be found.`);
+const getAsset = (releases, version, platformAndArchitecture, testing) => {
+    const helper = (releases, version, platformAndArchitecture, doTesting) => {
+        // Get the release matching the version specifier
+        const release = releases.find((release) => release.tag_name === version);
+        if (release === undefined) {
+            throw new Error(`A release with the tag '${version}' could not be found.`);
+        }
+        core.info(`Found a release with the tag '${release.tag_name}'.`);
+        if (release.assets.length === 0) {
+            throw new Error(`Release ${release.tag_name} has no assets.`);
+        }
+        // Get the releases matching the specified filters
+        core.info(`Finding assets matching the platform, architecture and ${doTesting ? "marked as testing" : "not marked as testing"}.`);
+        const assetsMatchingFilters = release.assets.filter((asset) => asset.name.includes(platformAndArchitecture) &&
+            asset.name.includes("TESTING") === doTesting);
+        if (assetsMatchingFilters.length === 0) {
+            throw new Error(`Release '${release.tag_name}' has no assets matching the platform and architecture '${platformAndArchitecture}' and ${doTesting ? "marked as testing" : "not marked as testing"}.`);
+        }
+        // Find the most recently released asset for the selected platform and architecture
+        const asset = assetsMatchingFilters.sort((a, b) => b.updated_at.localeCompare(a.updated_at))[0];
+        core.info(`Found the asset '${asset.name}'.`);
+        return asset;
+    };
+    switch (testing) {
+        case "always":
+            return helper(releases, version, platformAndArchitecture, true);
+        case "never":
+            return helper(releases, version, platformAndArchitecture, false);
+        // Auto will try downloading a testing asset and if it fails, download a non-testing asset
+        case "auto":
+            try {
+                return helper(releases, version, platformAndArchitecture, true);
+            }
+            catch {
+                return helper(releases, version, platformAndArchitecture, false);
+            }
     }
-    core.info(`Found a release with the tag '${release.tag_name}'.`);
-    if (release.assets.length == 0) {
-        throw new Error(`Release ${release.tag_name} has no assets.`);
-    }
-    // Get the releases matching the specified filters
-    core.info(`Finding assets matching the platform, architecture and ${TESTING ? "marked as testing" : "not marked as testing"}.`);
-    const assetsMatchingFilters = release.assets.filter((asset) => asset.name.includes(platformAndArchitecture) &&
-        asset.name.includes("TESTING") == TESTING);
-    if (assetsMatchingFilters.length === 0) {
-        throw new Error(`Release '${release.tag_name}' has no assets matching the platform and architecture '${platformAndArchitecture}' and ${TESTING ? "marked as testing" : "not marked as testing"}.`);
-    }
-    // Find the most recently released asset for the selected platform and architecture
-    const asset = assetsMatchingFilters.sort((a, b) => b.updated_at.localeCompare(a.updated_at))[0];
-    core.info(`Found the asset '${asset.name}'.`);
-    return asset;
 };
 const downloadRocBinary = async (asset) => {
     const assetUrl = asset.browser_download_url;
@@ -34495,11 +34528,12 @@ const downloadRocBinary = async (asset) => {
 };
 const main = async () => {
     try {
+        const testing = parseTestingInput(TESTING);
         const rocVersion = getVersion();
         core.setOutput("roc-version", rocVersion);
         const platformAndArchitecture = getPlatformAndArchitecture();
         const releases = await getRocReleases();
-        const asset = await getAsset(releases, rocVersion, platformAndArchitecture);
+        const asset = await getAsset(releases, rocVersion, platformAndArchitecture, testing);
         const { rocBinaryFolder, rocBinaryPath } = await downloadRocBinary(asset);
         core.setOutput("roc-path", rocBinaryPath);
         core.info(`Adding '${rocBinaryFolder}' to the PATH.`);

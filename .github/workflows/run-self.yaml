@@ -21,8 +21,9 @@ jobs:
           - ubuntu-latest
           # - macos-latest # TODO: Re-enable one day
         testing:
-          - "true"
-          - "false"
+          - always
+          - never
+          - auto
     runs-on: ${{ matrix.operating-systems }}
     steps:
       - name: Checkout the repo
