@@ -27,7 +27,7 @@ jobs:
     runs-on: ${{ matrix.operating-system }}
     steps:
       - name: Checkout the repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: install z3 on MacOS
         if: runner.os == 'macOS'
         run: brew install z3
