@@ -28,17 +28,20 @@ repos:
         id: prettier
         language: system
         entry: npx prettier --write
-        types: [ts, javascript]
+        types_or: [ts, javascript]
+        exclude: "dist/.*$"
       - name: Lint TypeScript files
         id: eslint
         language: system
         entry: npx eslint --fix
-        types: [ts, javascript]
+        types_or: [ts, javascript]
+        exclude: "dist/.*$"
       - name: Make sure Typescript code has been transpiled
         id: check-built
         language: system
         entry: npm ci && npm run build
-        types: [ts, javascript]
+        types_or: [ts, javascript]
+        exclude: "dist/.*$"
         always_run: true
         pass_filenames: false
 
