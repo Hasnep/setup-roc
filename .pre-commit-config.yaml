@@ -1,105 +1,118 @@
 repos:
   # General checks
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.6.0
+  - repo: local
     hooks:
       - name: Prevent committing to main
         id: no-commit-to-branch
+        language: system
+        entry: no-commit-to-branch
         args: [--branch, main]
+        pass_filenames: false
       - name: Make sure files end with a newline character
         id: end-of-file-fixer
+        language: system
+        entry: end-of-file-fixer
+        types: [text]
         exclude: "dist/.*$"
       - name: Remove trailing whitespace
-        id: trailing-whitespace
+        id: trailing-whitespace-fixer
+        language: system
+        entry: trailing-whitespace-fixer
+        types: [text]
         exclude: "dist/.*$"
       - name: Check for files that would conflict on case-insensitive filesystem
         id: check-case-conflict
+        language: system
+        entry: check-case-conflict
       - name: Check for merge conflicts
         id: check-merge-conflict
+        language: system
+        entry: check-merge-conflict
       - name: Check executable files have a shebang
         id: check-executables-have-shebangs
+        language: system
+        entry: check-executables-have-shebangs
+        types: [executable]
       - name: Check scripts with a shebang are executable
         id: check-shebang-scripts-are-executable
+        language: system
+        entry: check-shebang-scripts-are-executable
+      - name: Don't allow adding large files
+        id: check-added-large-files
+        language: system
+        entry: check-added-large-files
 
   # TypeScript
   - repo: local
     hooks:
       - name: Format TypeScript files
-        id: prettier
+        id: typescript-format
         language: system
-        entry: npx prettier --write
+        entry: prettier --write
         types_or: [ts, javascript]
         exclude: "dist/.*$"
-      - name: Lint TypeScript files
-        id: eslint
+      - name: Fix TypeScript files
+        id: typescript-fix
         language: system
-        entry: npx eslint --fix
+        entry: npx --no eslint --fix
         types_or: [ts, javascript]
         exclude: "dist/.*$"
       - name: Make sure Typescript code has been transpiled
         id: check-built
         language: system
-        entry: npm ci && npm run build
-        types_or: [ts, javascript]
-        exclude: "dist/.*$"
+        entry: npm run build
         always_run: true
         pass_filenames: false
 
-  # YAML
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.6.0
-    hooks:
-      - name: Validate YAML
-        id: check-yaml
-  - repo: local
-    hooks:
-      - name: Format YAML files
-        id: prettier
-        language: system
-        entry: npx prettier --write
-        types: [yaml]
-
   # JSON
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.6.0
-    hooks:
-      - name: Validate JSON
-        id: check-json
   - repo: local
     hooks:
       - name: Format JSON files
-        id: prettier
+        id: json-format
         language: system
-        entry: npx prettier --write
+        entry: prettier --write
         types: [json]
+
+  # YAML
+  - repo: local
+    hooks:
+      - name: Format YAML files
+        id: yaml-format
+        language: system
+        entry: prettier --write
+        types: [yaml]
 
   # Markdown
   - repo: local
     hooks:
       - name: Format markdown files
-        id: prettier
+        id: markdown-format
         language: system
-        entry: npx prettier --write
+        entry: prettier --write
         types: [markdown]
 
   # GitHub Actions
-  - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.29.0
+  - repo: local
     hooks:
       - name: Validate GitHub Actions workflow files
-        id: check-github-workflows
+        id: github-workflows-check
+        language: system
+        entry: actionlint
+        types: [yaml]
+        files: \.github/workflows/.*\.ya?ml$
       - name: Validate GitHub Actions file
-        id: check-github-actions
+        id: github-actions-check
+        language: system
+        entry: check-jsonschema
+        args: [--builtin-schema=vendor.github-actions]
+        types: [yaml]
+        files: ^action.ya?ml$
 
-  # Pre-commit
-  - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.29.0
+  # Nix
+  - repo: local
     hooks:
-      - name: Validate Pre-commit config
-        id: check-jsonschema
-        files: ^.*\.pre-commit-config.yaml$
-        args:
-          [
-            "--schemafile",
-            "https://json.schemastore.org/pre-commit-config.json",
-          ]
+      - name: Format Nix files
+        id: nix-format
+        language: system
+        entry: nixfmt
+        types: [nix]
