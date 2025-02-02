@@ -45,20 +45,14 @@ repos:
   # TypeScript
   - repo: local
     hooks:
-      - name: Format TypeScript files
-        id: typescript-format
-        language: system
-        entry: prettier --write
-        types_or: [ts, javascript]
-        exclude: "dist/.*$"
       - name: Fix TypeScript files
         id: typescript-fix
         language: system
-        entry: npx --no eslint --fix
+        entry: biome check --fix
         types_or: [ts, javascript]
         exclude: "dist/.*$"
       - name: Make sure Typescript code has been transpiled
-        id: check-built
+        id: typescript-check-built
         language: system
         entry: npm run build
         always_run: true
@@ -70,7 +64,7 @@ repos:
       - name: Format JSON files
         id: json-format
         language: system
-        entry: prettier --write
+        entry: biome check --fix
         types: [json]
 
   # YAML
@@ -81,6 +75,15 @@ repos:
         language: system
         entry: prettier --write
         types: [yaml]
+
+  # JSON
+  - repo: local
+    hooks:
+      - name: Format JSON files
+        id: json-format
+        language: system
+        entry: biome check --fix
+        types: [json]
 
   # Markdown
   - repo: local

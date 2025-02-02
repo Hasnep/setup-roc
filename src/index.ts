@@ -1,38 +1,45 @@
-import * as core from "@actions/core";
-import * as fs from "fs";
-import * as gh from "@actions/github";
-import * as os from "os";
-import * as path from "path";
-import * as tc from "@actions/tool-cache";
+import * as fs from "node:fs";
+import * as os from "node:os";
+import * as path from "node:path";
+import {
+  addPath,
+  getInput,
+  info,
+  setFailed,
+  setOutput,
+  warning,
+} from "@actions/core";
+import { getOctokit } from "@actions/github";
+import { downloadTool, extractTar } from "@actions/tool-cache";
 
 interface Asset {
   name: string;
-  browser_download_url: string;
-  updated_at: string;
+  browserDownloadUrl: string;
+  updatedAt: string;
 }
 
 interface Release {
-  tag_name: string;
+  tagName: string;
   assets: Asset[];
 }
 
-const TOKEN = core.getInput("token");
+const TOKEN = getInput("token");
 const AUTH = TOKEN ? `token ${TOKEN}` : undefined;
-const VERSION = core.getInput("roc-version");
-const VERSION_FILE = core.getInput("roc-version-file");
+const VERSION = getInput("roc-version");
+const VERSION_FILE = getInput("roc-version-file");
 const ROC_REPO_OWNER = "roc-lang";
 const ROC_REPO_NAME = "roc";
-const OCTOKIT_CLIENT = gh.getOctokit(TOKEN);
+const OCTOKIT_CLIENT = getOctokit(TOKEN);
 
 const getVersion = () => {
   if (VERSION && VERSION_FILE) {
-    core.warning(
+    warning(
       "Both 'roc-version' and 'roc-version-file' inputs were specified, only 'roc-version' will be used.",
     );
-    core.info(`Using version '${VERSION}' from 'roc-version'.`);
+    info(`Using version '${VERSION}' from 'roc-version'.`);
     return VERSION;
   } else if (VERSION) {
-    core.info(`Using version '${VERSION}' from 'roc-version'.`);
+    info(`Using version '${VERSION}' from 'roc-version'.`);
     return VERSION;
   } else if (VERSION_FILE) {
     if (!fs.existsSync(VERSION_FILE)) {
@@ -41,7 +48,7 @@ const getVersion = () => {
       );
     }
     const version = fs.readFileSync(VERSION_FILE).toString();
-    core.info(`Using version '${version}' from file '${VERSION_FILE}'.`);
+    info(`Using version '${version}' from file '${VERSION_FILE}'.`);
     return version;
   } else {
     throw new Error(
@@ -72,7 +79,7 @@ const getPlatformAndArchitecture = () => {
       `Unsupported combination of platform '${platform}' and architecture '${architecture}'.`,
     );
   }
-  core.info(`Using platform and architecture '${platformAndArchitecture}'.`);
+  info(`Using platform and architecture '${platformAndArchitecture}'.`);
   return platformAndArchitecture;
 };
 
@@ -85,8 +92,15 @@ const getRocReleases = async () => {
     throw new Error("Oh no!"); // TODO: Better error message here
   }
   const releases = response.data;
-  core.info(`Found ${releases.length} releases.`);
-  return releases;
+  info(`Found ${releases.length} releases.`);
+  return releases.map((r) => ({
+    tagName: r.tag_name,
+    assets: r.assets.map((a) => ({
+      name: a.name,
+      browserDownloadUrl: a.browser_download_url,
+      updatedAt: a.updated_at,
+    })),
+  }));
 };
 
 const getAsset = (
@@ -95,52 +109,52 @@ const getAsset = (
   platformAndArchitecture: string,
 ) => {
   // Get the release matching the version specifier
-  const release = releases.find((release) => release.tag_name === version);
+  const release = releases.find((release) => release.tagName === version);
   if (release === undefined) {
     throw new Error(`A release with the tag '${version}' could not be found.`);
   }
-  core.info(`Found a release with the tag '${release.tag_name}'.`);
+  info(`Found a release with the tag '${release.tagName}'.`);
 
   if (release.assets.length === 0) {
-    throw new Error(`Release ${release.tag_name} has no assets.`);
+    throw new Error(`Release ${release.tagName} has no assets.`);
   }
   // Get the releases matching the specified filters
-  core.info("Finding assets matching the platform and architecture.");
+  info("Finding assets matching the platform and architecture.");
   const assetsMatchingFilters = release.assets.filter((asset) =>
     asset.name.includes(platformAndArchitecture),
   );
   if (assetsMatchingFilters.length === 0) {
     throw new Error(
-      `Release '${release.tag_name}' has no assets matching the platform and architecture '${platformAndArchitecture}'.`,
+      `Release '${release.tagName}' has no assets matching the platform and architecture '${platformAndArchitecture}'.`,
     );
   }
 
   // Find the most recently released asset for the selected platform and architecture
   const asset = assetsMatchingFilters.sort((a, b) =>
-    b.updated_at.localeCompare(a.updated_at),
+    b.updatedAt.localeCompare(a.updatedAt),
   )[0];
-  core.info(`Found the asset '${asset.name}'.`);
+  info(`Found the asset '${asset.name}'.`);
   return asset;
 };
 
 const downloadRocBinary = async (asset: Asset) => {
-  const assetUrl = asset.browser_download_url;
-  core.info(`Downloading asset from '${assetUrl}'.`);
-  const downloadPath = await tc.downloadTool(assetUrl, undefined, AUTH);
-  core.info(`Extracting archive at '${downloadPath}'.`);
-  const extractedPath = await tc.extractTar(downloadPath);
+  const assetUrl = asset.browserDownloadUrl;
+  info(`Downloading asset from '${assetUrl}'.`);
+  const downloadPath = await downloadTool(assetUrl, undefined, AUTH);
+  info(`Extracting archive at '${downloadPath}'.`);
+  const extractedPath = await extractTar(downloadPath);
   // Get the first folder in the extracted archive
   const archiveRootFolderName = fs.readdirSync(extractedPath)[0];
   const rocBinaryFolder = path.join(extractedPath, archiveRootFolderName);
   const rocBinaryPath = path.join(rocBinaryFolder, "roc");
-  core.info(`The Roc binary was downloaded to '${rocBinaryPath}'.`);
+  info(`The Roc binary was downloaded to '${rocBinaryPath}'.`);
   return { rocBinaryFolder, rocBinaryPath };
 };
 
 const main = async () => {
   try {
     const rocVersion = getVersion();
-    core.setOutput("roc-version", rocVersion);
+    setOutput("roc-version", rocVersion);
 
     const platformAndArchitecture = getPlatformAndArchitecture();
 
@@ -149,14 +163,14 @@ const main = async () => {
     const asset = await getAsset(releases, rocVersion, platformAndArchitecture);
 
     const { rocBinaryFolder, rocBinaryPath } = await downloadRocBinary(asset);
-    core.setOutput("roc-path", rocBinaryPath);
+    setOutput("roc-path", rocBinaryPath);
 
-    core.info(`Adding '${rocBinaryFolder}' to the PATH.`);
-    core.addPath(rocBinaryFolder);
+    info(`Adding '${rocBinaryFolder}' to the PATH.`);
+    addPath(rocBinaryFolder);
 
-    core.info("Roc has been set up successfully.");
+    info("Roc has been set up successfully.");
   } catch (err) {
-    core.setFailed((err as Error).message);
+    setFailed((err as Error).message);
   }
 };
 

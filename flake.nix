@@ -20,6 +20,7 @@
             name = "setup-roc";
             packages = [
               pkgs.actionlint
+              pkgs.biome
               pkgs.check-jsonschema
               pkgs.nixfmt-rfc-style
               pkgs.nodejs_20 # Should be kept in sync with the version of Node.js that the action uses

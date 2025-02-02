@@ -5,10 +5,7 @@
   "description": "A GitHub Action to install Roc.",
   "main": "dist/index.js",
   "scripts": {
-    "build": "ncc build --license licenses.txt --out dist/ src/index.ts",
-    "fix": "eslint --fix .",
-    "lint": "eslint .",
-    "format": "prettier --write src/"
+    "build": "ncc build --license licenses.txt --out dist/ src/index.ts"
   },
   "author": "Hannes",
   "license": "MIT",
@@ -24,8 +21,6 @@
   "devDependencies": {
     "@types/node": "^20.17.12",
     "@vercel/ncc": "^0.38.3",
-    "eslint": "^9.18.0",
-    "typescript": "^5.5.3",
-    "typescript-eslint": "^8.19.1"
+    "typescript": "^5.5.3"
   }
 }

@@ -3709,7 +3709,7 @@ const semver = __importStar(__nccwpck_require__(9318));
 const stream = __importStar(__nccwpck_require__(2203));
 const util = __importStar(__nccwpck_require__(9023));
 const assert_1 = __nccwpck_require__(2613);
-const v4_1 = __importDefault(__nccwpck_require__(1350));
+const v4_1 = __importDefault(__nccwpck_require__(9021));
 const exec_1 = __nccwpck_require__(5236);
 const retry_helper_1 = __nccwpck_require__(7380);
 class HTTPError extends Error {
@@ -4329,90 +4329,6 @@ function _unique(values) {
     return Array.from(new Set(values));
 }
 //# sourceMappingURL=tool-cache.js.map
-
-/***/ }),
-
-/***/ 2727:
-/***/ ((module) => {
-
-/**
- * Convert array of 16 byte values to UUID string format of the form:
- * XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
- */
-var byteToHex = [];
-for (var i = 0; i < 256; ++i) {
-  byteToHex[i] = (i + 0x100).toString(16).substr(1);
-}
-
-function bytesToUuid(buf, offset) {
-  var i = offset || 0;
-  var bth = byteToHex;
-  // join used to fix memory issue caused by concatenation: https://bugs.chromium.org/p/v8/issues/detail?id=3175#c4
-  return ([
-    bth[buf[i++]], bth[buf[i++]],
-    bth[buf[i++]], bth[buf[i++]], '-',
-    bth[buf[i++]], bth[buf[i++]], '-',
-    bth[buf[i++]], bth[buf[i++]], '-',
-    bth[buf[i++]], bth[buf[i++]], '-',
-    bth[buf[i++]], bth[buf[i++]],
-    bth[buf[i++]], bth[buf[i++]],
-    bth[buf[i++]], bth[buf[i++]]
-  ]).join('');
-}
-
-module.exports = bytesToUuid;
-
-
-/***/ }),
-
-/***/ 9879:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-// Unique ID creation requires a high quality random # generator.  In node.js
-// this is pretty straight-forward - we use the crypto API.
-
-var crypto = __nccwpck_require__(6982);
-
-module.exports = function nodeRNG() {
-  return crypto.randomBytes(16);
-};
-
-
-/***/ }),
-
-/***/ 1350:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-var rng = __nccwpck_require__(9879);
-var bytesToUuid = __nccwpck_require__(2727);
-
-function v4(options, buf, offset) {
-  var i = buf && offset || 0;
-
-  if (typeof(options) == 'string') {
-    buf = options === 'binary' ? new Array(16) : null;
-    options = null;
-  }
-  options = options || {};
-
-  var rnds = options.random || (options.rng || rng)();
-
-  // Per 4.4, set bits for version and `clock_seq_hi_and_reserved`
-  rnds[6] = (rnds[6] & 0x0f) | 0x40;
-  rnds[8] = (rnds[8] & 0x3f) | 0x80;
-
-  // Copy bytes to buffer, if provided
-  if (buf) {
-    for (var ii = 0; ii < 16; ++ii) {
-      buf[i + ii] = rnds[ii];
-    }
-  }
-
-  return buf || bytesToUuid(rnds);
-}
-
-module.exports = v4;
-
 
 /***/ }),
 
@@ -32438,6 +32354,90 @@ exports.getUserAgent = getUserAgent;
 
 /***/ }),
 
+/***/ 8682:
+/***/ ((module) => {
+
+/**
+ * Convert array of 16 byte values to UUID string format of the form:
+ * XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+ */
+var byteToHex = [];
+for (var i = 0; i < 256; ++i) {
+  byteToHex[i] = (i + 0x100).toString(16).substr(1);
+}
+
+function bytesToUuid(buf, offset) {
+  var i = offset || 0;
+  var bth = byteToHex;
+  // join used to fix memory issue caused by concatenation: https://bugs.chromium.org/p/v8/issues/detail?id=3175#c4
+  return ([
+    bth[buf[i++]], bth[buf[i++]],
+    bth[buf[i++]], bth[buf[i++]], '-',
+    bth[buf[i++]], bth[buf[i++]], '-',
+    bth[buf[i++]], bth[buf[i++]], '-',
+    bth[buf[i++]], bth[buf[i++]], '-',
+    bth[buf[i++]], bth[buf[i++]],
+    bth[buf[i++]], bth[buf[i++]],
+    bth[buf[i++]], bth[buf[i++]]
+  ]).join('');
+}
+
+module.exports = bytesToUuid;
+
+
+/***/ }),
+
+/***/ 1694:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+// Unique ID creation requires a high quality random # generator.  In node.js
+// this is pretty straight-forward - we use the crypto API.
+
+var crypto = __nccwpck_require__(6982);
+
+module.exports = function nodeRNG() {
+  return crypto.randomBytes(16);
+};
+
+
+/***/ }),
+
+/***/ 9021:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+var rng = __nccwpck_require__(1694);
+var bytesToUuid = __nccwpck_require__(8682);
+
+function v4(options, buf, offset) {
+  var i = buf && offset || 0;
+
+  if (typeof(options) == 'string') {
+    buf = options === 'binary' ? new Array(16) : null;
+    options = null;
+  }
+  options = options || {};
+
+  var rnds = options.random || (options.rng || rng)();
+
+  // Per 4.4, set bits for version and `clock_seq_hi_and_reserved`
+  rnds[6] = (rnds[6] & 0x0f) | 0x40;
+  rnds[8] = (rnds[8] & 0x3f) | 0x80;
+
+  // Copy bytes to buffer, if provided
+  if (buf) {
+    for (var ii = 0; ii < 16; ++ii) {
+      buf[i + ii] = rnds[ii];
+    }
+  }
+
+  return buf || bytesToUuid(rnds);
+}
+
+module.exports = v4;
+
+
+/***/ }),
+
 /***/ 8264:
 /***/ ((module) => {
 
@@ -32587,6 +32587,30 @@ module.exports = require("net");
 
 "use strict";
 module.exports = require("node:events");
+
+/***/ }),
+
+/***/ 3024:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("node:fs");
+
+/***/ }),
+
+/***/ 8161:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("node:os");
+
+/***/ }),
+
+/***/ 6760:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("node:path");
 
 /***/ }),
 
@@ -34388,27 +34412,27 @@ var __webpack_exports__ = {};
 var exports = __webpack_exports__;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const core = __nccwpck_require__(7484);
-const fs = __nccwpck_require__(9896);
-const gh = __nccwpck_require__(3228);
-const os = __nccwpck_require__(857);
-const path = __nccwpck_require__(6928);
-const tc = __nccwpck_require__(3472);
-const TOKEN = core.getInput("token");
+const fs = __nccwpck_require__(3024);
+const os = __nccwpck_require__(8161);
+const path = __nccwpck_require__(6760);
+const core_1 = __nccwpck_require__(7484);
+const github_1 = __nccwpck_require__(3228);
+const tool_cache_1 = __nccwpck_require__(3472);
+const TOKEN = (0, core_1.getInput)("token");
 const AUTH = TOKEN ? `token ${TOKEN}` : undefined;
-const VERSION = core.getInput("roc-version");
-const VERSION_FILE = core.getInput("roc-version-file");
+const VERSION = (0, core_1.getInput)("roc-version");
+const VERSION_FILE = (0, core_1.getInput)("roc-version-file");
 const ROC_REPO_OWNER = "roc-lang";
 const ROC_REPO_NAME = "roc";
-const OCTOKIT_CLIENT = gh.getOctokit(TOKEN);
+const OCTOKIT_CLIENT = (0, github_1.getOctokit)(TOKEN);
 const getVersion = () => {
     if (VERSION && VERSION_FILE) {
-        core.warning("Both 'roc-version' and 'roc-version-file' inputs were specified, only 'roc-version' will be used.");
-        core.info(`Using version '${VERSION}' from 'roc-version'.`);
+        (0, core_1.warning)("Both 'roc-version' and 'roc-version-file' inputs were specified, only 'roc-version' will be used.");
+        (0, core_1.info)(`Using version '${VERSION}' from 'roc-version'.`);
         return VERSION;
     }
     else if (VERSION) {
-        core.info(`Using version '${VERSION}' from 'roc-version'.`);
+        (0, core_1.info)(`Using version '${VERSION}' from 'roc-version'.`);
         return VERSION;
     }
     else if (VERSION_FILE) {
@@ -34416,7 +34440,7 @@ const getVersion = () => {
             throw new Error(`The specified Roc version file at: '${VERSION_FILE}' doesn't exist.`);
         }
         const version = fs.readFileSync(VERSION_FILE).toString();
-        core.info(`Using version '${version}' from file '${VERSION_FILE}'.`);
+        (0, core_1.info)(`Using version '${version}' from file '${VERSION_FILE}'.`);
         return version;
     }
     else {
@@ -34442,7 +34466,7 @@ const getPlatformAndArchitecture = () => {
     if (platformAndArchitecture === null) {
         throw new Error(`Unsupported combination of platform '${platform}' and architecture '${architecture}'.`);
     }
-    core.info(`Using platform and architecture '${platformAndArchitecture}'.`);
+    (0, core_1.info)(`Using platform and architecture '${platformAndArchitecture}'.`);
     return platformAndArchitecture;
 };
 const getRocReleases = async () => {
@@ -34454,58 +34478,65 @@ const getRocReleases = async () => {
         throw new Error("Oh no!"); // TODO: Better error message here
     }
     const releases = response.data;
-    core.info(`Found ${releases.length} releases.`);
-    return releases;
+    (0, core_1.info)(`Found ${releases.length} releases.`);
+    return releases.map((r) => ({
+        tagName: r.tag_name,
+        assets: r.assets.map((a) => ({
+            name: a.name,
+            browserDownloadUrl: a.browser_download_url,
+            updatedAt: a.updated_at,
+        })),
+    }));
 };
 const getAsset = (releases, version, platformAndArchitecture) => {
     // Get the release matching the version specifier
-    const release = releases.find((release) => release.tag_name === version);
+    const release = releases.find((release) => release.tagName === version);
     if (release === undefined) {
         throw new Error(`A release with the tag '${version}' could not be found.`);
     }
-    core.info(`Found a release with the tag '${release.tag_name}'.`);
+    (0, core_1.info)(`Found a release with the tag '${release.tagName}'.`);
     if (release.assets.length === 0) {
-        throw new Error(`Release ${release.tag_name} has no assets.`);
+        throw new Error(`Release ${release.tagName} has no assets.`);
     }
     // Get the releases matching the specified filters
-    core.info("Finding assets matching the platform and architecture.");
+    (0, core_1.info)("Finding assets matching the platform and architecture.");
     const assetsMatchingFilters = release.assets.filter((asset) => asset.name.includes(platformAndArchitecture));
     if (assetsMatchingFilters.length === 0) {
-        throw new Error(`Release '${release.tag_name}' has no assets matching the platform and architecture '${platformAndArchitecture}'.`);
+        throw new Error(`Release '${release.tagName}' has no assets matching the platform and architecture '${platformAndArchitecture}'.`);
     }
     // Find the most recently released asset for the selected platform and architecture
-    const asset = assetsMatchingFilters.sort((a, b) => b.updated_at.localeCompare(a.updated_at))[0];
-    core.info(`Found the asset '${asset.name}'.`);
+    const asset = assetsMatchingFilters.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))[0];
+    (0, core_1.info)(`Found the asset '${asset.name}'.`);
     return asset;
 };
 const downloadRocBinary = async (asset) => {
-    const assetUrl = asset.browser_download_url;
-    core.info(`Downloading asset from '${assetUrl}'.`);
-    const downloadPath = await tc.downloadTool(assetUrl, undefined, AUTH);
-    core.info(`Extracting archive at '${downloadPath}'.`);
-    const extractedPath = await tc.extractTar(downloadPath);
+    const assetUrl = asset.browserDownloadUrl;
+    (0, core_1.info)(`Downloading asset from '${assetUrl}'.`);
+    const downloadPath = await (0, tool_cache_1.downloadTool)(assetUrl, undefined, AUTH);
+    (0, core_1.info)(`Extracting archive at '${downloadPath}'.`);
+    const extractedPath = await (0, tool_cache_1.extractTar)(downloadPath);
     // Get the first folder in the extracted archive
     const archiveRootFolderName = fs.readdirSync(extractedPath)[0];
     const rocBinaryFolder = path.join(extractedPath, archiveRootFolderName);
     const rocBinaryPath = path.join(rocBinaryFolder, "roc");
-    core.info(`The Roc binary was downloaded to '${rocBinaryPath}'.`);
+    (0, core_1.info)(`The Roc binary was downloaded to '${rocBinaryPath}'.`);
     return { rocBinaryFolder, rocBinaryPath };
 };
 const main = async () => {
     try {
         const rocVersion = getVersion();
-        core.setOutput("roc-version", rocVersion);
+        (0, core_1.setOutput)("roc-version", rocVersion);
         const platformAndArchitecture = getPlatformAndArchitecture();
         const releases = await getRocReleases();
         const asset = await getAsset(releases, rocVersion, platformAndArchitecture);
         const { rocBinaryFolder, rocBinaryPath } = await downloadRocBinary(asset);
-        core.setOutput("roc-path", rocBinaryPath);
-        core.info(`Adding '${rocBinaryFolder}' to the PATH.`);
-        core.addPath(rocBinaryFolder);
-        core.info("Roc has been set up successfully.");
+        (0, core_1.setOutput)("roc-path", rocBinaryPath);
+        (0, core_1.info)(`Adding '${rocBinaryFolder}' to the PATH.`);
+        (0, core_1.addPath)(rocBinaryFolder);
+        (0, core_1.info)("Roc has been set up successfully.");
     }
     catch (err) {
-        core.setFailed(err.message);
+        (0, core_1.setFailed)(err.message);
     }
 };
 main();
