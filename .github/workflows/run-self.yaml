@@ -20,10 +20,6 @@ jobs:
         operating-system:
           - ubuntu-latest
           - macos-latest
-        testing:
-          - always
-          - never
-          - auto
     runs-on: ${{ matrix.operating-system }}
     steps:
       - name: Checkout the repo
@@ -33,7 +29,5 @@ jobs:
         run: brew install z3
       - name: Run the action
         uses: ./
-        with:
-          testing: ${{ matrix.testing }}
       - name: Make sure Roc is installed
         run: roc --version

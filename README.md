@@ -34,8 +34,6 @@ Other combinations of OS and architecture are not currently supported.
   Mutually exclusive with the `roc-version-file` input.
 - `roc-version-file` - Path to a file containing the Roc version to use.
   Mutually exclusive with the `roc-version` input.
-- `testing` - Whether to use versions of Roc marked as testing. Either `auto` to use testing versions when available, `always` to only use testing versions and fail when one is not found, or the default value `never` will ignore testing versions.
-  Defaults to `never`.
 - `token` - GitHub token to use when accessing the GitHub API.
   Defaults to the automatically generated GitHub token.
 
