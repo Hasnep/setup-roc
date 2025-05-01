@@ -16,7 +16,7 @@ jobs:
       - name: Check out the repository
         uses: actions/checkout@v4
       - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v16
+        uses: DeterminateSystems/nix-installer-action@v17
       - name: Cache Nix environment
         uses: DeterminateSystems/magic-nix-cache-action@v8
       - name: Use Nix dev shell for subsequent steps
